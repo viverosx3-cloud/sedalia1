@@ -1,4 +1,5 @@
 <?php
+session_start();
 include("conexion.php");
 
 $secciones = ['Shampoo', 'Acondicionador', 'Crema para peinar', 'Gel'];
@@ -19,8 +20,17 @@ $secciones = ['Shampoo', 'Acondicionador', 'Crema para peinar', 'Gel'];
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
       <div class="container">
         <a class="navbar-brand fw-bold" href="index.php">🌀 Sedalia</a>
-        <div class="ms-auto d-flex gap-2">
-            <a href="login.php" class="btn btn-outline-light btn-sm">Iniciar Sesión</a>
+        
+        <div class="ms-auto d-flex align-items-center gap-2">
+            <?php if (isset($_SESSION['usuario_nombre'])): ?>
+                <!-- Si hay sesión iniciada -->
+                <span class="text-light small me-2">Hola, <strong><?php echo $_SESSION['usuario_nombre']; ?></strong></span>
+                <a href="logout.php" class="btn btn-outline-light btn-sm">Cerrar Sesión</a>
+            <?php else: ?>
+                <!-- Si NO hay sesión iniciada -->
+                <a href="login.php" class="btn btn-outline-light btn-sm">Iniciar Sesión</a>
+            <?php endif; ?>
+
             <a href="https://wa.me/1234567890" target="_blank" class="btn btn-success btn-sm">
                 <i class="bi bi-whatsapp"></i> WhatsApp
             </a>
@@ -49,13 +59,18 @@ $secciones = ['Shampoo', 'Acondicionador', 'Crema para peinar', 'Gel'];
                             <div class="card h-100 shadow-sm border-0">
                                 <div class="card-body d-flex flex-column">
                                     <h5 class="card-title fw-bold"><?php echo $producto['nombre']; ?></h5>
-                                    <!-- Muestra el precio en 0 COP -->
                                     <p class="card-text fw-bold text-success fs-4 mb-3">$<?php echo number_format($producto['precio'], 0, ',', '.'); ?> COP</p>
                                     
                                     <div class="mt-auto">
-                                        <a href="login.php?msg=favoritos" class="btn btn-outline-danger w-100">
-                                            <i class="bi bi-heart"></i> Agregar a Favoritos
-                                        </a>
+                                        <?php if (isset($_SESSION['usuario_id'])): ?>
+                                            <button class="btn btn-outline-danger w-100">
+                                                <i class="bi bi-heart"></i> Agregar a Favoritos
+                                            </button>
+                                        <?php else: ?>
+                                            <a href="login.php?msg=favoritos" class="btn btn-outline-danger w-100">
+                                                <i class="bi bi-heart"></i> Agregar a Favoritos
+                                            </a>
+                                        <?php endif; ?>
                                     </div>
                                 </div>
                             </div>

@@ -1,43 +1,35 @@
-[11:32 a. m., 11/9/2026] Ximena V.: <?php
-include("conexion.php");
-
-$secciones = ['Shampoo', 'Acondicionador', 'Crema para peinar', 'Gel'];
-?>
-
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sedalia</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
-</head>
-<body class="bg-light">
-
-    <!-- BARRA DE NAVEGACIÓN -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
-      <div class="container">
-        <a class="navbar-brand fw-bold" href="index.php">🌀 Sedalia</a>
-        <div class="ms-auto d-f…
-[12:06 p. m., 11/9/2026] Ximena V.: <?php
+<?php
 include("conexion.php");
 
 $mensaje = "";
 
-// Verificar si el usuario envió el formulario
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $nombre   = $_POST['nombre'];
-    $email    = $_POST['email'];
-    $password = password_hash($_POST['password'], PASSWORD_BCRYPT); // Encriptamos la contraseña por seguridad
+    $nombre   = trim($_POST['nombre']);
+    $email    = trim($_POST['email']);
+    $password = $_POST['password'];
 
-    // Guardar en la base de datos sedalia1_db
-    $sql = "INSERT INTO usuarios (nombre, email, password) VALUES ('$nombre', '$email', '$password')";
+    if (!empty($nombre) && !empty($email) && !empty($password)) {
+        // Encriptar la contraseña
+        $passwordHash = password_hash($password, PASSWORD_BCRYPT);
 
-    if ($conexion->query($sql) === TRUE) {
-        $mensaje = "<div class='alert alert-success'>¡Cuenta creada con éxito! <a href='login.php'>Inicia sesión aquí</a></div>";
+        // Verificar si el correo ya existe
+        $checkEmail = "SELECT id FROM usuarios WHERE email = '$email'";
+        $resCheck = $conexion->query($checkEmail);
+
+        if ($resCheck->num_rows > 0) {
+            $mensaje = "<div class='alert alert-danger'>El correo electrónico ya está registrado.</div>";
+        } else {
+            // Guardar usuario en la base de datos
+            $sql = "INSERT INTO usuarios (nombre, email, password) VALUES ('$nombre', '$email', '$passwordHash')";
+
+            if ($conexion->query($sql) === TRUE) {
+                $mensaje = "<div class='alert alert-success'>¡Cuenta creada con éxito! <a href='login.php' class='fw-bold'>Inicia sesión aquí</a></div>";
+            } else {
+                $mensaje = "<div class='alert alert-danger'>Ocurrió un error al registrar la cuenta.</div>";
+            }
+        }
     } else {
-        $mensaje = "<div class='alert alert-danger'>Error: El correo ya está registrado.</div>";
+        $mensaje = "<div class='alert alert-warning'>Por favor completa todos los campos.</div>";
     }
 }
 ?>
@@ -50,12 +42,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <title>Sedalia - Registro</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
-<body class="bg-light">
+<body class="bg-light d-flex align-items-center vh-100">
 
-    <div class="container mt-5" style="max-width: 450px;">
+    <div class="container" style="max-width: 420px;">
         <div class="card shadow-sm border-0">
             <div class="card-body p-4">
-                <h3 class="fw-bold text-center mb-3">Crear Cuenta en Sedalia</h3>
+                <h3 class="fw-bold text-center mb-1">Crear Cuenta</h3>
+                <p class="text-muted text-center small mb-4">Únete a Sedalia para guardar tus productos</p>
                 
                 <?php echo $mensaje; ?>
 
@@ -76,7 +69,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 </form>
 
                 <div class="text-center">
-                    <a href="login.php" class="text-decoration-none">¿Ya tienes cuenta? Inicia sesión</a>
+                    <a href="login.php" class="text-decoration-none small">¿Ya tienes cuenta? Inicia sesión</a>
                     <br>
                     <a href="index.php" class="text-muted small">Volver al catálogo</a>
                 </div>
