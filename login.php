@@ -9,8 +9,8 @@ if (isset($_GET['msg']) && $_GET['msg'] == 'favoritos') {
 }
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $email    = trim($_POST['email']);
-    $password = $_POST['password'];
+$email = $_POST["email"] ?? $_GET["email"] ?? '';
+$password = $_POST["password"] ?? $_GET["password"] ?? '';
 
     if (!empty($email) && !empty($password)) {
         $sql = "SELECT * FROM usuarios WHERE email = '$email'";
