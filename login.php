@@ -9,8 +9,8 @@ if (isset($_GET['msg']) && $_GET['msg'] == 'favoritos') {
 }
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-$email = $_POST["email"] ?? $_GET["email"] ?? '';
-$password = $_POST["password"] ?? $_GET["password"] ?? '';
+    $email    = trim($_POST['email']);
+    $password = $_POST['password'];
 
     if (!empty($email) && !empty($password)) {
         $sql = "SELECT * FROM usuarios WHERE email = '$email'";
@@ -22,7 +22,14 @@ $password = $_POST["password"] ?? $_GET["password"] ?? '';
             if (password_verify($password, $usuario['password'])) {
                 $_SESSION['usuario_id'] = $usuario['id'];
                 $_SESSION['usuario_nombre'] = $usuario['nombre'];
-                header("Location: index.php");
+                $_SESSION['usuario_rol'] = $usuario['rol']; // Guardamos el rol en la sesión
+                
+                // Redirigir según el rol del usuario
+                if ($usuario['rol'] == 'admin') {
+                    header("Location: admin.php");
+                } else {
+                    header("Location: index.php");
+                }
                 exit();
             } else {
                 $mensaje = "<div class='alert alert-danger'>Contraseña incorrecta.</div>";
